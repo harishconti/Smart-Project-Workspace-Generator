@@ -1,0 +1,6 @@
+{
+  "name": "Smart Project Workspace Generator",
+  "description": "An AI-powered application to generate complete project workspace structures and document templates based on a user's project description. Define your project, and let AI build the foundation.",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
