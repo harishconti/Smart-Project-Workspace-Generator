@@ -10,6 +10,7 @@ export interface ProjectInput {
     projectDescription: string;
     placeholders: TemplateVariable[];
     fileStructure: string;
+    templateDocId?: string;
 }
 
 export interface FileSystemNode {
@@ -25,4 +26,9 @@ export interface ProjectChange {
     newContent?: string;
     status: 'CREATED' | 'UPDATED' | 'DELETED';
     reasoning?: string;
+}
+
+export interface UserProfile {
+    name: string;
+    picture: string;
 }
