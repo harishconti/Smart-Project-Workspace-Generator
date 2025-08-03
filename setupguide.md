@@ -50,15 +50,39 @@ npm run dev
 ```
 The frontend will be accessible at the URL provided by Vite (usually `http://localhost:5173`).
 
-## 2. Production Deployment (High-Level Steps)
+## 2. Low-Cost Production Deployment
 
-To deploy this application to a production environment, you would need to:
+This section provides a guide for deploying the application with minimal to no cost, using services with generous free tiers.
 
-1.  **Choose a Hosting Provider**: A platform like Heroku, AWS, or Google Cloud Run that can host both a Python backend and a static React frontend.
-2.  **Build the Frontend**: Run `npm run build` to create a production-ready build of the React application in the `dist` directory.
-3.  **Configure the Backend to Serve Frontend**: Modify the Flask application to serve the static files from the `dist` directory.
-4.  **Set Environment Variables**: Securely set the `client_secret.json` content as an environment variable on the server, instead of keeping it as a file.
-5.  **Update Redirect URI**: Update your Google OAuth credentials to use your production URL for the redirect URI.
+### Recommended Services
+-   **Backend**: [Render](https://render.com/) (Free tier for web services)
+-   **Frontend**: [Netlify](https://www.netlify.com/) or [Vercel](https://vercel.com/) (Free tier for static sites)
+-   **Database**: [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) (Free shared cluster) or [PlanetScale](https://planetscale.com/) (Free tier for SQL)
+
+### Deployment Steps
+
+#### a. Frontend Deployment (Netlify/Vercel)
+1.  Push your project to a GitHub, GitLab, or Bitbucket repository.
+2.  Sign up for Netlify or Vercel and connect your Git repository.
+3.  Configure the build settings:
+    -   **Build Command**: `npm run build`
+    -   **Publish Directory**: `dist`
+4.  Deploy the site. Netlify/Vercel will give you a public URL (e.g., `your-project.netlify.app`).
+
+#### b. Backend Deployment (Render)
+1.  In your Flask app (`backend/app.py`), you'll need to add a CORS (Cross-Origin Resource Sharing) configuration to allow requests from your frontend's URL. You can use the `flask-cors` library.
+2.  Sign up for Render and create a new "Web Service".
+3.  Connect the same Git repository.
+4.  Configure the service settings:
+    -   **Environment**: Python 3
+    -   **Build Command**: `pip install -r backend/requirements.txt`
+    -   **Start Command**: `gunicorn backend.app:app` (You'll need to add `gunicorn` to your `requirements.txt`)
+5.  Add your `client_secret.json` content as a secret file or individual environment variables in the Render dashboard.
+6.  Render will provide a public URL for your backend (e.g., `your-backend.onrender.com`).
+
+#### c. Final Configuration
+1.  **Update Backend URL in Frontend**: In your frontend code, make sure any API requests point to your new backend URL on Render.
+2.  **Update Google OAuth Redirect URI**: Go back to the Google Cloud Console and add your backend's callback URL (e.g., `https://your-backend.onrender.com/auth/callback`) to the authorized redirect URIs.
 
 ## 3. Future Development Tasks
 
