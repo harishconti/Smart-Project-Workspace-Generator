@@ -1,5 +1,5 @@
 import React from 'react';
-import type { ProjectInput, TemplateVariable } from '../types';
+import type { ProjectInput, TemplateVariable, UserProfile } from '../types';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
 import { Textarea } from './ui/Textarea';
@@ -18,14 +18,15 @@ interface ProjectInputFormProps {
     onLoadTemplate: (name:string) => void;
     onDeleteTemplate: (name: string) => void;
     isAiEnabled: boolean;
+    userProfile: UserProfile | null;
 }
 
-export const ProjectInputForm: React.FC<ProjectInputFormProps> = ({ 
+export const ProjectInputForm: React.FC<ProjectInputFormProps> = ({
     input, onInputChange, onGenerate, isLoading,
     templates, onSaveTemplate, onLoadTemplate, onDeleteTemplate,
-    isAiEnabled
+    isAiEnabled, userProfile
 }) => {
-    const { projectName, projectDescription, placeholders, fileStructure } = input;
+    const { projectName, projectDescription, placeholders, fileStructure, templateDocId } = input;
 
     const handleChange = (field: keyof Omit<ProjectInput, 'placeholders'>, value: string) => {
         onInputChange({ ...input, [field]: value });
@@ -69,6 +70,13 @@ export const ProjectInputForm: React.FC<ProjectInputFormProps> = ({
                             <label htmlFor="projectDescription" className="block text-sm font-medium text-brand-text/80">Project Description</label>
                             <Textarea id="projectDescription" value={projectDescription} onChange={(e) => handleChange('projectDescription', e.target.value)} rows={4} required />
                         </div>
+
+                        {userProfile && (
+                            <div className="space-y-2">
+                                <label htmlFor="templateDocId" className="block text-sm font-medium text-brand-text/80">Google Doc Template ID (optional)</label>
+                                <Input id="templateDocId" value={templateDocId || ''} onChange={(e) => handleChange('templateDocId', e.target.value)} />
+                            </div>
+                        )}
 
                         <div className="space-y-3">
                             <label className="block text-sm font-medium text-brand-text/80">Template Variables</label>

@@ -42,7 +42,35 @@ const App: React.FC = () => {
     const [isCreatingInDrive, setIsCreatingInDrive] = useState<boolean>(false);
     const [driveCreationSuccess, setDriveCreationSuccess] = useState<string | null>(null);
     const [driveCreationError, setDriveCreationError] = useState<string | null>(null);
+    const [isCreatingDocument, setIsCreatingDocument] = useState<boolean>(false);
+    const [documentCreationSuccess, setDocumentCreationSuccess] = useState<string | null>(null);
+    const [documentCreationError, setDocumentCreationError] = useState<string | null>(null);
 
+
+    const handleCreateDocument = async (templateId: string, newName: string, parentId: string, replacements: [string, string][]) => {
+        setIsCreatingDocument(true);
+        setDocumentCreationSuccess(null);
+        setDocumentCreationError(null);
+        try {
+            const response = await fetch('/api/drive/create-document', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ templateId, newName, parentId, replacements }),
+            });
+            const result = await response.json();
+            if (response.ok) {
+                setDocumentCreationSuccess(result.message);
+            } else {
+                setDocumentCreationError(result.error || 'An unknown error occurred.');
+            }
+        } catch (error) {
+            setDocumentCreationError('Failed to connect to the server.');
+        } finally {
+            setIsCreatingDocument(false);
+        }
+    };
 
     const handleCreateInDrive = async () => {
         if (!workspaceData) {
@@ -259,6 +287,7 @@ const App: React.FC = () => {
                             onLoadTemplate={handleLoadTemplate}
                             onDeleteTemplate={handleDeleteTemplate}
                             isAiEnabled={isAiEnabled}
+                            userProfile={userProfile}
                          />
                     </div>
                     <div className="lg:col-span-8 xl:col-span-9">
@@ -277,15 +306,31 @@ const App: React.FC = () => {
                                 {driveCreationError}
                             </div>
                         )}
+                        {isCreatingDocument && (
+                            <div className="p-4 mb-4 text-sm text-blue-700 bg-blue-100 rounded-lg" role="alert">
+                                Creating document in Google Drive...
+                            </div>
+                        )}
+                        {documentCreationSuccess && (
+                            <div className="p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg" role="alert">
+                                {documentCreationSuccess}
+                            </div>
+                        )}
+                        {documentCreationError && (
+                            <div className="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
+                                {documentCreationError}
+                            </div>
+                        )}
                         <WorkspaceDisplay 
                             workspaceData={workspaceData} 
                             isLoading={isLoading} 
                             error={error} 
                             onContentUpdate={handleContentUpdate}
                             onProjectRefactor={handleProjectRefactor}
-                            projectName={projectInput.projectName}
-                            projectDescription={projectInput.projectDescription}
+                            projectInput={projectInput}
                             isAiEnabled={isAiEnabled}
+                            userProfile={userProfile}
+                            onCreateDocument={handleCreateDocument}
                         />
                     </div>
                 </main>

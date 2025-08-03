@@ -10,6 +10,7 @@ export interface ProjectInput {
     projectDescription: string;
     placeholders: TemplateVariable[];
     fileStructure: string;
+    templateDocId?: string;
 }
 
 export interface FileSystemNode {

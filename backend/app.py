@@ -73,7 +73,36 @@ if __name__ == '__main__':
     # Using port 5001 as specified in the plan and client_secret.json
     app.run(debug=True, port=5001)
 
-from backend.drive_service import create_folders_in_drive
+from backend.drive_service import create_folders_in_drive, copy_file, replace_text_in_doc
+
+@app.route('/api/drive/create-document', methods=['POST'])
+def create_document():
+    """
+    Creates a new document in Google Drive by copying a template and replacing text.
+    """
+    if 'credentials' not in session:
+        return jsonify({'error': 'User not authenticated'}), 401
+
+    data = request.get_json()
+    template_id = data.get('templateId')
+    new_name = data.get('newName')
+    parent_id = data.get('parentId')
+    replacements = data.get('replacements')
+
+    if not all([template_id, new_name, parent_id, replacements]):
+        return jsonify({'error': 'Missing required parameters'}), 400
+
+    try:
+        # 1. Copy the template document
+        copied_doc_id = copy_file(session['credentials'], template_id, new_name, parent_id)
+
+        # 2. Replace the text in the new document
+        replace_text_in_doc(session['credentials'], copied_doc_id, replacements)
+
+        return jsonify({'message': f'Successfully created document: {new_name}'})
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({'error': 'Failed to create document in Google Drive.'}), 500
 
 @app.route('/api/drive/create-folders', methods=['POST'])
 def create_folders():

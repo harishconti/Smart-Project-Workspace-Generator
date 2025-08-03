@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { FileSystemNode, ProjectChange } from '../types';
+import type { FileSystemNode, ProjectChange, UserProfile, ProjectInput } from '../types';
 import { Card } from './ui/Card';
 import { Spinner } from './ui/Spinner';
 import { FileTree } from './FileTree';
@@ -16,9 +16,10 @@ interface WorkspaceDisplayProps {
     error: string | null;
     onContentUpdate: (nodeId: string, newContent: string) => void;
     onProjectRefactor: (changes: ProjectChange[]) => void;
-    projectName: string;
-    projectDescription: string;
+    projectInput: ProjectInput;
     isAiEnabled: boolean;
+    userProfile: UserProfile | null;
+    onCreateDocument: (templateId: string, newName: string, parentId: string, replacements: [string, string][]) => void;
 }
 
 const WelcomeState: React.FC = () => (
@@ -33,8 +34,8 @@ const WelcomeState: React.FC = () => (
 );
 
 
-export const WorkspaceDisplay: React.FC<WorkspaceDisplayProps> = ({ 
-    workspaceData, isLoading, error, onContentUpdate, onProjectRefactor, projectName, projectDescription, isAiEnabled
+export const WorkspaceDisplay: React.FC<WorkspaceDisplayProps> = ({
+    workspaceData, isLoading, error, onContentUpdate, onProjectRefactor, projectInput, isAiEnabled, userProfile, onCreateDocument
 }) => {
     const [selectedFile, setSelectedFile] = useState<FileSystemNode | null>(null);
     const [isZipping, setIsZipping] = useState<boolean>(false);
@@ -165,6 +166,25 @@ export const WorkspaceDisplay: React.FC<WorkspaceDisplayProps> = ({
                         >
                            {isZipping ? <Spinner size="sm" className="mr-2" /> : <DownloadIcon className="h-4 w-4 mr-2" />}
                            {isZipping ? 'Zipping...' : 'Download .zip'}
+                        </Button>
+                    )}
+                    {userProfile && projectInput.templateDocId && workspaceData && (
+                        <Button
+                            onClick={() => {
+                                // For simplicity, we'll assume the first folder is the parent.
+                                // A more robust solution would allow the user to select the parent folder.
+                                const parentFolder = workspaceData.find(node => node.type === 'folder');
+                                if (parentFolder) {
+                                    const replacements = projectInput.placeholders.map(p => [`{{${p.name}}}`, p.value] as [string, string]);
+                                    onCreateDocument(projectInput.templateDocId, `${projectInput.projectName}-doc`, parentFolder.id, replacements);
+                                } else {
+                                    alert("Could not find a parent folder to create the document in.");
+                                }
+                            }}
+                            variant="success"
+                            size="md"
+                        >
+                            Create Document
                         </Button>
                     )}
                 </div>

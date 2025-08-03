@@ -32,6 +32,7 @@ The goal is to eliminate the tedious, repetitive setup process for new projects,
 -   **Manual Fallback Mode**: For precise control, toggle off AI to quickly generate an exact file/folder structure from a text outline.
 -   **Download as .zip**: Package the entire generated workspace into a downloadable zip file.
 -   **Automated `.gitignore`**: The AI automatically includes a relevant `.gitignore` file for the specified project type.
+-   **Google Drive Integration**: Authenticate with your Google account to create project folder structures directly in your Google Drive.
 
 ## Tech Stack
 
@@ -56,6 +57,7 @@ The application is structured into several key directories:
 -   `types.ts`: Defines all TypeScript interfaces and types used across the application.
 -   `App.tsx`: The main application component that manages state and orchestrates the different parts of the UI.
 -   `index.html`: The entry point of the application, which includes the `importmap` for module resolution.
+-   `backend/`: Contains the Python Flask server that handles Google OAuth and Google Drive API interactions.
 
 ## Setup & Running
 
@@ -118,17 +120,20 @@ The following core components from the technical documentation are not present i
 
 To achieve the vision of the technical documentation, development should proceed in the following order of priority:
 
-1.  **Priority 1: Establish Backend Infrastructure**
+1.  **[COMPLETED] Priority 1: Establish Backend Infrastructure**
     -   **Task**: Set up a basic backend server (e.g., Node.js with Express) and a database.
     -   **Goal**: Create the foundation for all server-side logic, user management, and secure token handling. This is the most critical prerequisite.
+    -   **Status**: A Python/Flask backend has been created. A database has not yet been implemented.
 
-2.  **Priority 2: Implement Google OAuth 2.0 Authentication**
+2.  **[COMPLETED] Priority 2: Implement Google OAuth 2.0 Authentication**
     -   **Task**: Build the full OAuth 2.0 flow. The backend will handle the code-for-token exchange and securely store refresh tokens in the database.
     -   **Goal**: Enable users to securely log in with their Google account and grant the application the necessary `drive.file` and `documents` scopes.
+    -   **Status**: The full OAuth 2.0 flow is implemented. Token storage is currently in the browser session, not a database.
 
-3.  **Priority 3: Develop Google Drive Folder Generation**
+3.  **[COMPLETED] Priority 3: Develop Google Drive Folder Generation**
     -   **Task**: Create a service that uses the authenticated user's token to call the Google Drive API (`files.create` with `mimeType: 'application/vnd.google-apps.folder'`).
     -   **Goal**: Allow users to define a folder structure that is then created in their "My Drive." This is the first deliverable feature for authenticated users.
+    -   **Status**: Implemented. The application can create nested folder structures in the user's Google Drive.
 
 4.  **Priority 4: Implement Google Docs Templating and Population**
     -   **Task**: Build the UI and backend logic for linking a Google Doc as a template. Use the Drive API (`files.copy`) to duplicate it and the Docs API (`documents.batchUpdate`) to perform find-and-replace operations for placeholders.
