@@ -26,3 +26,8 @@ export interface ProjectChange {
     status: 'CREATED' | 'UPDATED' | 'DELETED';
     reasoning?: string;
 }
+
+export interface UserProfile {
+    name: string;
+    picture: string;
+}
